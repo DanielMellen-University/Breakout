@@ -18,7 +18,7 @@ pip install pygame
 From this folder, run:
 
 ```bash
-python3 Breakout5.py
+python3 breakout.py
 ```
 
 The game opens in fullscreen at the primary monitor resolution detected by Pygame.
