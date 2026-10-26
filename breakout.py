@@ -165,7 +165,7 @@ class Menu:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return None
+                    raise SystemExit
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
                         self.selected = (self.selected - 1) % len(self.options)
@@ -695,7 +695,7 @@ class Game:
 
     def handle_events(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: self.running = False
+            if event.type == pygame.QUIT: raise SystemExit
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     for ball in self.balls:
