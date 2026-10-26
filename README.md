@@ -2,23 +2,6 @@
 
 A fullscreen Pygame version of Breakout with procedural brick layouts, multi-hit bricks, particle effects, level selection, and power-ups.
 
-## Screenshots
-
-![Title menu](docs/screenshots/title-menu.png)
-Title menu.
-
-![Bomb brick exploding](docs/screenshots/bomb-explosion.png)
-A bomb brick exploding on level 2.
-
-![Three balls in play](docs/screenshots/multiball.png)
-Three balls in play after an extra-ball pickup.
-
-![Slow time active](docs/screenshots/slow-time.png)
-Slow time active, with the blue screen tint.
-
-![Power-ups falling on level 3](docs/screenshots/level-3-powerups.png)
-Power-ups falling on level 3, with the ripple from a bomb.
-
 ## Requirements
 
 - Python 3
@@ -95,3 +78,20 @@ Power-up messages briefly float upward when collected or triggered.
 - Triggering a bomb brick awards 10 points. Bricks destroyed by the blast award nothing.
 - The level number increases automatically after all bricks are cleared.
 - Ball speed scales upward as levels increase.
+
+## Screenshots
+
+![Title menu](docs/screenshots/title-menu.png)
+Title menu.
+
+![Bomb brick exploding](docs/screenshots/bomb-explosion.png)
+A bomb brick exploding on level 2.
+
+![Three balls in play](docs/screenshots/multiball.png)
+Three balls in play after an extra-ball pickup.
+
+![Slow time active](docs/screenshots/slow-time.png)
+Slow time active, with the blue screen tint.
+
+![Power-ups falling on level 3](docs/screenshots/level-3-powerups.png)
+Power-ups falling on level 3, with the ripple from a bomb.
