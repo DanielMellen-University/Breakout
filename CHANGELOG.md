@@ -17,8 +17,7 @@ Gameplay, as of this release:
 Project changes:
 
 - Added `requirements.txt` (`pygame>=2.1`), `.gitignore`, and an MIT `LICENSE`.
-- Added `tools/capture_demo.py`, a headless autopilot run that saves real frames, with `--seed` for repeatable runs.
-- Added `docs/media/gameplay.gif`, recorded with that script, and instructions to regenerate it.
+- Added a gameplay GIF to the README.
 - Rewrote the README: badges, demo GIF, features, one-command quick start, controls, architecture diagram, screenshots, limitations, and project structure.
 
 Known limitations: fullscreen only, speed tied to resolution and frame rate, no sound or high scores, and no automated tests or CI yet.

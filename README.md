@@ -70,7 +70,6 @@ flowchart TD
     game --> brick[Brick]
     game --> powerup[PowerUp]
     game --> fx["Particle, TimeRipple,<br/>PowerUpMessage"]
-    capture["tools/capture_demo.py"] -.->|imports| game
 ```
 
 1. `main()` switches between title, level select, and play states.
@@ -84,7 +83,7 @@ flowchart TD
 | ![Title menu](docs/screenshots/title-menu.png) Title menu. | ![Three balls in play](docs/screenshots/multiball.png) Three balls after an extra-ball pickup. |
 | ![Bomb brick exploding](docs/screenshots/bomb-explosion.png) A bomb brick going off on level 2. | ![Slow time active](docs/screenshots/slow-time.png) Slow time with the blue tint. |
 
-One more on level 3 is in [docs/screenshots](docs/screenshots/level-3-powerups.png). The GIF above comes from a real headless run; [docs/media/README.md](docs/media/README.md) has the exact command to regenerate it.
+One more on level 3 is in [docs/screenshots](docs/screenshots/level-3-powerups.png).
 
 ## Limitations
 
@@ -93,14 +92,13 @@ One more on level 3 is in [docs/screenshots](docs/screenshots/level-3-powerups.p
 - **No sound, high scores, or saves.** A game over drops you straight back to the title menu.
 - **Level select stops at 4**, though play continues past it with rows capped at 25.
 - **Rectangle collisions.** The ball uses a bounding box, so corner hits can bounce a little off.
-- **No automated tests or CI yet.** `tools/capture_demo.py` doubles as a headless smoke run: `SDL_VIDEODRIVER=dummy python tools/capture_demo.py --out /tmp/frames --seed 6 --frames 600 --every 300`.
+- **No automated tests or CI yet.**
 
 ## Project structure
 
 ```
 breakout.py              the whole game: menus, entities, effects, main loop
-tools/capture_demo.py    headless autopilot run that saves real frames
-docs/media/gameplay.gif  README demo, recorded with the script above
+docs/media/gameplay.gif  README demo
 docs/screenshots/        gameplay screenshots
 requirements.txt         pygame
 ```
@@ -108,7 +106,6 @@ requirements.txt         pygame
 ## Docs
 
 - [Changelog](CHANGELOG.md)
-- [Regenerating the demo GIF](docs/media/README.md)
 
 ## License
 
