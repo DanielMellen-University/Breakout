@@ -1,97 +1,115 @@
 # Breakout
 
-A fullscreen Pygame version of Breakout with procedural brick layouts, multi-hit bricks, particle effects, level selection, and power-ups.
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab)
+![pygame 2](https://img.shields.io/badge/pygame-2.x-6aa84f)
+[![License: MIT](https://img.shields.io/badge/license-MIT-8fd19a)](LICENSE)
 
-## Requirements
+**A fullscreen Pygame take on Atari Breakout with a new random brick field every level, power-ups, multiball, and bombs.**
 
-- Python 3
-- Pygame
+Clear the field, keep at least one ball alive, and each level comes back with more rows, tougher bricks, and a faster ball.
 
-Install Pygame if it is not already available:
+![10 seconds of level 2: two extra-ball pickups, three balls in play, and bomb bricks clearing chunks of the field](docs/media/gameplay.gif)
+
+## Features
+
+- **Random brick fields**: every level builds a new layout from a smoothed noise grid, so no two runs look the same.
+- **Rising difficulty**: each level adds two rows (up to 25), shifts bricks toward 3 and 4 hits, and makes the ball 5% faster.
+- **Multi-hit bricks** that take one to four hits and change color from yellow to red as they wear down.
+- **Five power-ups**: slow time, a wider paddle, an extra ball, an extra life, and bomb bricks that blow up their neighbors.
+- **Multiball**: every extra-ball pickup adds another ball to the field.
+- **Paddle aim**: where the ball lands on the paddle sets its bounce angle, up to 45 degrees either way.
+- **Effects**: particles on every hit, a ripple distortion from bombs, and a blue warp while slow time is active.
+- **Menus**: title, level select (levels 1 to 4), and a pause menu with a 3 second resume countdown.
+- **Scales to your screen**: paddle, bricks, ball, fonts, and power-ups are sized from the display resolution.
+
+## Quick start
 
 ```bash
-pip install pygame
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/python breakout.py
 ```
 
-## Running the Game
-
-From this folder, run:
-
-```bash
-python3 breakout.py
-```
-
-The game opens in fullscreen at the resolution of the largest connected display (by pixel area) reported by Pygame. This is not always the primary monitor.
+The game opens fullscreen on the largest connected display (by pixel area), which is not always the primary monitor.
 
 ## Controls
 
 | Action | Control |
 | --- | --- |
-| Move paddle left | Left arrow |
-| Move paddle right | Right arrow |
+| Move paddle | Left / Right arrows |
 | Launch ball | Space |
 | Pause | `P` or `Esc` |
-| Navigate menus | Up/down arrows or mouse |
-| Select menu option | Enter or left mouse click |
+| Navigate menus | Up / Down arrows or mouse |
+| Select | Enter or left click |
 
-## How It Works
+## How it plays
 
-The goal is to clear every brick on the screen by keeping the ball in play with the paddle. When the ball hits a brick, the brick either loses durability or breaks. Broken bricks add to the score and may drop a power-up. If every active ball falls below the screen, one life is lost and a new ball is attached to the paddle.
-
-The lives counter starts at 3. You still get a new ball when the counter reaches 0, so you effectively have four balls. Losing the ball at Lives: 0 ends the game and returns to the title menu. Clearing all bricks advances to the next level, rebuilds the brick field, increases ball speed, and resets temporary paddle expansion effects.
-
-## Menus
-
-- **Title menu:** Start a new game, choose a starting level, or quit.
-- **Level select:** Start from levels 1 through 4.
-- **Pause menu:** Resume, restart the current level, return to level select, or quit.
-
-When resuming from pause, the game shows a short countdown before play continues.
-
-## Features
-
-- **Procedural brick fields:** Each level generates a new brick layout using randomized noise.
-- **Increasing difficulty:** Later levels create more rows, more durable bricks, and faster ball movement.
-- **Multi-hit bricks:** Bricks can require one to four hits. Their color changes as durability drops.
-- **Power-up bricks:** Flashing bricks indicate special effects or collectible drops. When the ball hits a brick without breaking it, there is a 2% chance that brick turns into a one-hit power-up brick of a random type (bomb included).
-- **Multiple balls:** Extra-ball power-ups add another active ball to the playfield.
-- **Particle effects:** Wall hits, paddle hits, brick breaks, bombs, and slow time all spawn particles.
-- **Fullscreen scaling:** Paddle size and speed, brick size, ball size, fonts, and power-up size and fall speed scale from the detected screen size. Ball speed is a fixed number of pixels per frame and does not scale. Particle movement and the distortion effects are also fixed in pixels.
-
-## Power-Ups
+You start with 3 lives. Losing every ball on the field costs a life and puts a new ball on the paddle; a new ball still comes at Lives: 0, so you effectively get four. Clearing every brick moves you to the next level and resets the wide-paddle effect.
 
 | Power-up | Color | Effect |
 | --- | --- | --- |
-| Slow time | Blue | Slows active balls and adds a screen distortion effect for about 10 seconds. |
-| Extend platform | Purple | Widens the paddle for the next several ball hits. |
-| Extra ball | Green | Adds another ball to the current level. |
+| Slow time | Blue | Halves ball speed for about 10 seconds and warps the screen. |
+| Extend platform | Purple | Widens the paddle by 50% for the next 5 paddle hits. |
+| Extra ball | Green | Drops a new ball in from the top. |
 | Extra life | Pink | Adds one life. |
-| Bomb | Cyan | Explodes nearby regular bricks, clears any falling power-ups in the blast area, and creates a ripple effect. |
+| Bomb | Cyan | Goes off on contact and breaks every regular brick around it. |
 
-The first four drop from their brick when it breaks and take effect when the paddle catches them. Bomb never drops as a pickup. It goes off as soon as the ball hits a bomb brick.
+Power-up bricks flash and always break in one hit. The first four drop a pickup you catch with the paddle; bombs trigger right away. A brick that survives a hit also has a 2% chance of turning into a power-up brick. Each broken brick and each bomb scores 10 points; bricks destroyed by a blast score nothing.
 
-Power-up messages briefly float upward when collected or triggered.
+## How it works
 
-## Scoring and Progression
+Everything lives in one file, `breakout.py`, running a fixed 60 FPS loop.
 
-- Breaking a brick awards 10 points.
-- Triggering a bomb brick awards 10 points. Bricks destroyed by the blast award nothing.
-- The level number increases automatically after all bricks are cleared.
-- Ball speed scales upward as levels increase.
+```mermaid
+flowchart TD
+    main["main()<br/>state machine"] --> title[TitleMenu]
+    main --> levels[LevelSelectMenu]
+    main --> game[Game]
+    title & levels & pause[PauseMenu] -.->|subclass| menu[Menu]
+    game --> pause
+    game --> paddle[Paddle]
+    game --> ball[Ball]
+    game --> brick[Brick]
+    game --> powerup[PowerUp]
+    game --> fx["Particle, TimeRipple,<br/>PowerUpMessage"]
+    capture["tools/capture_demo.py"] -.->|imports| game
+```
+
+1. `main()` switches between title, level select, and play states.
+2. `Game.create_bricks()` samples a 10x25 random grid with bilinear interpolation and places a brick wherever the value is above 0.5. The hit distribution depends on the level.
+3. Each frame, `Game.update()` moves balls, resolves wall, paddle, and brick collisions, applies bombs and pickups, and ages particles and ripples. `Game.draw()` renders it all with the ripple and slow-time offsets applied.
 
 ## Screenshots
 
-![Title menu](docs/screenshots/title-menu.png)
-Title menu.
+| | |
+| --- | --- |
+| ![Title menu](docs/screenshots/title-menu.png) Title menu. | ![Three balls in play](docs/screenshots/multiball.png) Three balls after an extra-ball pickup. |
+| ![Bomb brick exploding](docs/screenshots/bomb-explosion.png) A bomb brick going off on level 2. | ![Slow time active](docs/screenshots/slow-time.png) Slow time with the blue tint. |
 
-![Bomb brick exploding](docs/screenshots/bomb-explosion.png)
-A bomb brick exploding on level 2.
+One more on level 3 is in [docs/screenshots](docs/screenshots/level-3-powerups.png). The GIF above comes from a real headless run; [docs/media/README.md](docs/media/README.md) has the exact command to regenerate it.
 
-![Three balls in play](docs/screenshots/multiball.png)
-Three balls in play after an extra-ball pickup.
+## Limitations
 
-![Slow time active](docs/screenshots/slow-time.png)
-Slow time active, with the blue screen tint.
+- **Fullscreen only.** There is no windowed mode or resolution option.
+- **Speed depends on resolution and frame rate.** Ball speed is a fixed number of pixels per frame, so the game feels faster on smaller screens, and physics slow down if the machine cannot hold 60 FPS.
+- **No sound, high scores, or saves.** A game over drops you straight back to the title menu.
+- **Level select stops at 4**, though play continues past it with rows capped at 25.
+- **Rectangle collisions.** The ball uses a bounding box, so corner hits can bounce a little off.
+- **No automated tests or CI yet.** `tools/capture_demo.py` doubles as a headless smoke run: `SDL_VIDEODRIVER=dummy python tools/capture_demo.py --out /tmp/frames --seed 6 --frames 600 --every 300`.
 
-![Power-ups falling on level 3](docs/screenshots/level-3-powerups.png)
-Power-ups falling on level 3, with the ripple from a bomb.
+## Project structure
+
+```
+breakout.py              the whole game: menus, entities, effects, main loop
+tools/capture_demo.py    headless autopilot run that saves real frames
+docs/media/gameplay.gif  README demo, recorded with the script above
+docs/screenshots/        gameplay screenshots
+requirements.txt         pygame
+```
+
+## Docs
+
+- [Changelog](CHANGELOG.md)
+- [Regenerating the demo GIF](docs/media/README.md)
+
+## License
+
+MIT. See [LICENSE](LICENSE).
