@@ -286,3 +286,28 @@ class TestLevelProgression(BreakoutTestCase):
         self.assertEqual(game.paddle.width, game.paddle.default_width)
         self.assertFalse(game.paddle.is_expanded)
         self.assertEqual(game.paddle.expand_hits, 0)
+
+
+class TestSlowTimePowerUp(BreakoutTestCase):
+    def test_slow_time_halves_speed_extends_and_restores(self):
+        game = self.make_game()
+        ball = game.balls[0]
+        ball.attached = False
+        ball.dx, ball.dy = 6, 8
+        original_speed = ball.speed = math.hypot(ball.dx, ball.dy)
+        pickup = breakout.PowerUp(10, 20, "slow_time", game.screen_height)
+
+        pickup.apply_effect(game.paddle, game.balls, game)
+        self.assertAlmostEqual(ball.speed, original_speed / 2)
+        self.assertEqual(ball.slow_timer, 600)
+        self.assertEqual(game.slow_time_active, 600)
+        self.assertAlmostEqual(math.hypot(ball.dx, ball.dy), ball.speed)
+
+        pickup.apply_effect(game.paddle, game.balls, game)
+        self.assertAlmostEqual(ball.speed, original_speed / 2)
+        self.assertEqual(ball.slow_timer, 1200)
+        ball.slow_timer = 1
+        ball.update()
+        self.assertEqual(ball.slow_timer, 0)
+        self.assertEqual(ball.speed, ball.default_speed)
+        self.assertAlmostEqual(math.hypot(ball.dx, ball.dy), ball.default_speed)
