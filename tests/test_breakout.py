@@ -152,3 +152,32 @@ class TestTopWallCollision(BreakoutTestCase):
         self.assertEqual(ball.y, ball.radius)
         self.assertGreater(ball.dy, 0)
         self.assertAlmostEqual(math.hypot(ball.dx, ball.dy), ball.speed)
+
+
+class TestPaddleBounce(BreakoutTestCase):
+    def test_aim_ranges_from_center_to_forty_five_degrees(self):
+        game = self.make_game()
+        paddle = game.paddle
+        cases = ((paddle.x + paddle.width / 2, 0), (paddle.x, -math.pi / 4))
+        for x, expected_angle in cases:
+            ball = breakout.Ball(paddle, 8, game.ball_radius, 800, 600,
+                                 x=x, y=paddle.y + 1)
+            ball.dx, ball.dy = 0, 8
+            ball.check_collision(paddle, [], game)
+            self.assertAlmostEqual(math.atan2(ball.dx, -ball.dy), expected_angle)
+            self.assertLessEqual(abs(math.atan2(ball.dx, -ball.dy)), math.pi / 4)
+
+    def test_expansion_expires_after_configured_paddle_hits(self):
+        game = self.make_game()
+        paddle = game.paddle
+        paddle.width = paddle.increased_width
+        paddle.is_expanded = True
+        paddle.expand_hits = 1
+        ball = breakout.Ball(paddle, 8, game.ball_radius, 800, 600,
+                             x=paddle.x + paddle.width / 2, y=paddle.y + 1)
+
+        ball.check_collision(paddle, [], game)
+
+        self.assertEqual(paddle.expand_hits, 0)
+        self.assertFalse(paddle.is_expanded)
+        self.assertEqual(paddle.width, paddle.default_width)
