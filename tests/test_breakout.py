@@ -181,3 +181,22 @@ class TestPaddleBounce(BreakoutTestCase):
         self.assertEqual(paddle.expand_hits, 0)
         self.assertFalse(paddle.is_expanded)
         self.assertEqual(paddle.width, paddle.default_width)
+
+
+class TestBrickCollision(BreakoutTestCase):
+    def test_side_impact_returns_brick_and_reverses_horizontal_motion(self):
+        game = self.make_game()
+        brick = breakout.Brick(100, 100, 50, 20, 2)
+        brick.power_up_type = None
+        brick.hits = 2
+        brick.max_hits = 2
+        brick.color = brick.get_color()
+        ball = breakout.Ball(game.paddle, 5, 6, 800, 600, x=95, y=110)
+        ball.dx, ball.dy = 5, 0
+
+        hit_bricks, particles = ball.check_collision(game.paddle, [brick], game)
+
+        self.assertEqual(hit_bricks, [brick])
+        self.assertEqual(len(particles), 8)
+        self.assertLess(ball.dx, 0)
+        self.assertEqual(brick.hits, 2)
