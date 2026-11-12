@@ -390,3 +390,18 @@ class TestFallingPowerUp(BreakoutTestCase):
         game.power_ups = [pickup]
         game.update()
         self.assertEqual(game.power_ups, [])
+
+
+class TestPowerUpCollection(BreakoutTestCase):
+    def test_paddle_collects_pickup_and_removes_it(self):
+        game = self.make_game()
+        pickup = breakout.PowerUp(game.paddle.x, game.paddle.y - 1,
+                                  "extra_life", game.screen_height)
+        game.power_ups = [pickup]
+        original_lives = game.lives
+
+        game.update()
+
+        self.assertEqual(game.lives, original_lives + 1)
+        self.assertEqual(game.power_ups, [])
+        self.assertEqual(game.power_up_messages[-1].text, "+life")
