@@ -139,3 +139,16 @@ class TestWallCollision(BreakoutTestCase):
         self.assertEqual(ball.x, ball.radius)
         self.assertGreater(ball.dx, 0)
         self.assertAlmostEqual(math.hypot(ball.dx, ball.dy), ball.speed)
+
+
+class TestTopWallCollision(BreakoutTestCase):
+    def test_top_wall_corrects_position_and_reverses_vertical_motion(self):
+        game = self.make_game()
+        ball = breakout.Ball(game.paddle, 5, 6, 800, 600, x=300, y=1)
+        ball.dx, ball.dy = 3, -4
+        with mock.patch.object(breakout.random, "uniform", return_value=0):
+            ball.check_collision(game.paddle, [], game)
+
+        self.assertEqual(ball.y, ball.radius)
+        self.assertGreater(ball.dy, 0)
+        self.assertAlmostEqual(math.hypot(ball.dx, ball.dy), ball.speed)
