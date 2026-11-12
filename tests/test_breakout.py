@@ -239,3 +239,25 @@ class TestLifeLoss(BreakoutTestCase):
         self.assertEqual(len(game.balls), 1)
         self.assertIsNot(game.balls[0], lost_ball)
         self.assertTrue(game.balls[0].attached)
+
+
+class TestLastLifeBall(BreakoutTestCase):
+    def test_zero_lives_still_gets_one_ball_then_game_over(self):
+        game = self.make_game()
+        game.lives = 1
+        first = breakout.Ball(game.paddle, 5, game.ball_radius, 800, 600,
+                              x=400, y=601)
+        first.dy = 1
+        game.balls = [first]
+
+        game.update()
+        self.assertEqual(game.lives, 0)
+        self.assertTrue(game.running)
+        self.assertTrue(game.balls[0].attached)
+
+        last = game.balls[0]
+        last.attached = False
+        last.x, last.y, last.dx, last.dy = 400, 601, 0, 1
+        game.update()
+        self.assertFalse(game.running)
+        self.assertEqual(game.balls, [])
