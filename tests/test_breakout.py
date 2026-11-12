@@ -482,3 +482,24 @@ class TestPauseResume(BreakoutTestCase):
         self.assertIsNone(result)
         self.assertFalse(game.paused)
         self.assertEqual([call.args[0] for call in wait.call_args_list], [1000, 1000, 1000])
+
+
+class TestMenuResults(BreakoutTestCase):
+    def test_menu_subclasses_map_selected_options(self):
+        screen = pygame.Surface((800, 600))
+        title = breakout.TitleMenu(screen, 800, 600)
+        levels = breakout.LevelSelectMenu(screen, 800, 600)
+        pause = breakout.PauseMenu(screen, 800, 600)
+
+        for index, expected in enumerate(("start", "level_select", "quit")):
+            with self.subTest(menu="title", index=index), \
+                    mock.patch.object(breakout.Menu, "run", return_value=index):
+                self.assertEqual(title.run(), expected)
+        for index, expected in enumerate((1, 2, 3, 4)):
+            with self.subTest(menu="levels", index=index), \
+                    mock.patch.object(breakout.Menu, "run", return_value=index):
+                self.assertEqual(levels.run(), expected)
+        for index, expected in enumerate(("resume", "restart", "level_select", "quit")):
+            with self.subTest(menu="pause", index=index), \
+                    mock.patch.object(breakout.Menu, "run", return_value=index):
+                self.assertEqual(pause.run(), expected)
