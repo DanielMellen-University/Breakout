@@ -1,6 +1,7 @@
 """Offline tests for Breakout's game logic."""
 
 import unittest
+from unittest import mock
 
 import pygame
 
@@ -57,3 +58,17 @@ class TestPowerUpBrick(BreakoutTestCase):
         self.assertIsNone(brick.color)
         brick.hit()
         self.assertTrue(brick.broken)
+
+
+class TestBrickHitDistribution(BreakoutTestCase):
+    def test_difficulty_tiers_assign_expected_durability(self):
+        cases = ((1, 0.84, 2), (2, 0.69, 2), (3, 0.79, 3), (4, 0.69, 3))
+        for level, roll, expected_hits in cases:
+            with self.subTest(level=level):
+                game = self.make_game(level)
+                with mock.patch.object(breakout.random, "uniform", return_value=0.75), \
+                        mock.patch.object(breakout.random, "random", return_value=roll), \
+                        mock.patch.object(breakout.random, "randint", return_value=2):
+                    bricks = game.create_bricks()
+                self.assertTrue(bricks)
+                self.assertTrue(all(brick.hits == expected_hits for brick in bricks))
