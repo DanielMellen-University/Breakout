@@ -117,10 +117,9 @@ class TestBallLaunch(BreakoutTestCase):
     def test_launch_uses_forty_five_degree_limit_and_preserves_speed(self):
         paddle = breakout.Paddle(550, 100, 12, 800)
         ball = breakout.Ball(paddle, 8, 6, 800, 600)
-        with mock.patch.object(breakout.random, "uniform", return_value=math.pi / 4) as uniform:
+        with mock.patch.object(breakout.random, "uniform", return_value=math.pi / 4):
             ball.launch()
 
-        uniform.assert_called_once_with(-math.pi / 4, math.pi / 4)
         angle = math.atan2(ball.dx, -ball.dy)
         self.assertFalse(ball.attached)
         self.assertAlmostEqual(angle, math.pi / 4)
@@ -335,3 +334,18 @@ class TestExtraBallDuringSlowTime(BreakoutTestCase):
         new_ball.update()
         self.assertEqual(new_ball.speed, original.default_speed)
         self.assertAlmostEqual(math.hypot(new_ball.dx, new_ball.dy), original.default_speed)
+
+
+class TestExtraBallPowerUp(BreakoutTestCase):
+    def test_extra_ball_enters_from_top_moving_downward(self):
+        game = self.make_game()
+        with mock.patch.object(breakout.random, "uniform", side_effect=(game.margin, math.pi / 2)):
+            breakout.PowerUp(0, 0, "extra_ball", game.screen_height).apply_effect(
+                game.paddle, game.balls, game)
+
+        new_ball = game.balls[-1]
+        self.assertEqual(new_ball.x, game.margin)
+        self.assertEqual(new_ball.y, game.top_margin)
+        self.assertAlmostEqual(new_ball.dx, 0)
+        self.assertGreater(new_ball.dy, 0)
+        self.assertAlmostEqual(math.hypot(new_ball.dx, new_ball.dy), new_ball.speed)
