@@ -405,3 +405,21 @@ class TestPowerUpCollection(BreakoutTestCase):
         self.assertEqual(game.lives, original_lives + 1)
         self.assertEqual(game.power_ups, [])
         self.assertEqual(game.power_up_messages[-1].text, "+life")
+
+
+class TestBombActivation(BreakoutTestCase):
+    def test_bomb_contact_scores_and_creates_ripple_and_message(self):
+        game = self.make_game()
+        bomb = breakout.Brick(100, 100, 50, 20, 1, power_up_type="bomb")
+        remote = breakout.Brick(600, 400, 50, 20, 1, power_up_type="extra_life")
+        game.bricks = [bomb, remote]
+        ball = breakout.Ball(game.paddle, 5, 6, 800, 600, x=95, y=110)
+        ball.dx = 5
+        game.balls = [ball]
+
+        game.update()
+
+        self.assertTrue(bomb.broken)
+        self.assertEqual(game.score, 10)
+        self.assertEqual(len(game.time_ripples), 1)
+        self.assertEqual(game.power_up_messages[-1].text, "+bomb")
