@@ -84,3 +84,18 @@ class TestBrickRowCaps(BreakoutTestCase):
                 occupied_rows = {round((brick.y - game.top_margin) / (game.brick_height + game.gap))
                                  for brick in bricks}
                 self.assertEqual(len(occupied_rows), expected_rows)
+
+
+class TestBrickLayoutBounds(BreakoutTestCase):
+    def test_generated_bricks_fit_column_slots_inside_margins(self):
+        game = self.make_game()
+        with mock.patch.object(breakout.random, "uniform", return_value=0.75):
+            bricks = game.create_bricks()
+
+        self.assertTrue(bricks)
+        for brick in bricks:
+            self.assertGreaterEqual(brick.x, game.margin)
+            self.assertLessEqual(brick.x + brick.width, game.screen_width - game.margin + 1e-9)
+            column = round((brick.x - game.margin) / (game.brick_width + game.gap))
+            self.assertGreaterEqual(column, 0)
+            self.assertLess(column, game.brick_columns)
