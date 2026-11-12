@@ -223,3 +223,19 @@ class TestBrickScoring(BreakoutTestCase):
 
         self.assertTrue(brick.broken)
         self.assertEqual(game.score, 10)
+
+
+class TestLifeLoss(BreakoutTestCase):
+    def test_last_lost_ball_costs_life_and_creates_attached_replacement(self):
+        game = self.make_game()
+        lost_ball = breakout.Ball(game.paddle, 5, game.ball_radius, 800, 600,
+                                  x=400, y=601)
+        lost_ball.dx, lost_ball.dy = 0, 1
+        game.balls = [lost_ball]
+
+        game.update()
+
+        self.assertEqual(game.lives, 2)
+        self.assertEqual(len(game.balls), 1)
+        self.assertIsNot(game.balls[0], lost_ball)
+        self.assertTrue(game.balls[0].attached)
