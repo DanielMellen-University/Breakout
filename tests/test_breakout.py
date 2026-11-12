@@ -376,3 +376,17 @@ class TestExtendPaddlePowerUp(BreakoutTestCase):
         self.assertEqual(expanded_width, default_width * 1.5)
         self.assertEqual(game.paddle.width, expanded_width)
         self.assertEqual(game.paddle.expand_hits, 10)
+
+
+class TestFallingPowerUp(BreakoutTestCase):
+    def test_pickup_falls_and_is_removed_below_screen(self):
+        game = self.make_game()
+        pickup = breakout.PowerUp(10, 20, "extra_life", game.screen_height)
+        original_y = pickup.y
+        pickup.move()
+        self.assertEqual(pickup.y, original_y + pickup.velocity)
+
+        pickup.y = game.screen_height + 1
+        game.power_ups = [pickup]
+        game.update()
+        self.assertEqual(game.power_ups, [])
