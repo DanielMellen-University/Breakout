@@ -444,3 +444,20 @@ class TestBombBlast(BreakoutTestCase):
         self.assertTrue(neighbor.broken)
         self.assertFalse(remote.broken)
         self.assertEqual(game.score, 10)
+
+
+class TestBombPowerUpProtection(BreakoutTestCase):
+    def test_blast_leaves_neighboring_power_up_brick_intact(self):
+        game = self.make_game()
+        bomb = breakout.Brick(100, 100, 50, 20, 1, power_up_type="bomb")
+        protected = breakout.Brick(160, 100, 50, 20, 1, power_up_type="extra_life")
+        game.bricks = [bomb, protected]
+        ball = breakout.Ball(game.paddle, 5, 6, 800, 600, x=95, y=110)
+        ball.dx = 5
+        game.balls = [ball]
+
+        game.update()
+
+        self.assertTrue(bomb.broken)
+        self.assertFalse(protected.broken)
+        self.assertEqual(protected.hits, 1)
