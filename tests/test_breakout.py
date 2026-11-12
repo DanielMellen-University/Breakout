@@ -261,3 +261,28 @@ class TestLastLifeBall(BreakoutTestCase):
         game.update()
         self.assertFalse(game.running)
         self.assertEqual(game.balls, [])
+
+
+class TestLevelProgression(BreakoutTestCase):
+    def test_clearing_field_advances_speed_and_resets_paddle(self):
+        game = self.make_game(level=2)
+        cleared_brick = breakout.Brick(10, 20, 40, 12, 1)
+        cleared_brick.broken = True
+        game.bricks = [cleared_brick]
+        game.paddle.width = game.paddle.increased_width
+        game.paddle.is_expanded = True
+        game.paddle.expand_hits = 3
+        old_ball = game.balls[0]
+
+        with mock.patch.object(game, "create_bricks", return_value=[]):
+            game.update()
+
+        self.assertEqual(game.level, 3)
+        self.assertAlmostEqual(game.speed_multiplier, 1.5 * (1.05 ** 2))
+        self.assertEqual(len(game.balls), 1)
+        self.assertIsNot(game.balls[0], old_ball)
+        self.assertAlmostEqual(game.balls[0].speed, game.base_speed * game.speed_multiplier)
+        self.assertTrue(game.balls[0].attached)
+        self.assertEqual(game.paddle.width, game.paddle.default_width)
+        self.assertFalse(game.paddle.is_expanded)
+        self.assertEqual(game.paddle.expand_hits, 0)
