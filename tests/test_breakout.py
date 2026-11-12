@@ -46,3 +46,14 @@ class TestBrickDurability(BreakoutTestCase):
         brick.hit()
         self.assertTrue(brick.broken)
         self.assertEqual(brick.hits, 0)
+
+
+class TestPowerUpBrick(BreakoutTestCase):
+    def test_power_up_brick_is_single_hit_and_uses_special_color(self):
+        brick = breakout.Brick(10, 20, 40, 12, 4, power_up_type="extra_life")
+
+        self.assertEqual(brick.hits, 1)
+        self.assertEqual(brick.max_hits, 1)
+        self.assertIsNone(brick.color)
+        brick.hit()
+        self.assertTrue(brick.broken)
