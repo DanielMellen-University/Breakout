@@ -99,3 +99,14 @@ class TestBrickLayoutBounds(BreakoutTestCase):
             column = round((brick.x - game.margin) / (game.brick_width + game.gap))
             self.assertGreaterEqual(column, 0)
             self.assertLess(column, game.brick_columns)
+
+
+class TestPaddleMovement(BreakoutTestCase):
+    def test_paddle_stays_within_left_and_right_edges(self):
+        paddle = breakout.Paddle(550, 100, 12, 800)
+        paddle.x = 0
+        paddle.move("left", 800)
+        self.assertEqual(paddle.x, 0)
+        paddle.x = 700
+        paddle.move("right", 800)
+        self.assertEqual(paddle.x, 700)
