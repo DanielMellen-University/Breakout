@@ -361,3 +361,18 @@ class TestExtraLifePowerUp(BreakoutTestCase):
         self.assertEqual(game.lives, starting_lives + 1)
         self.assertEqual(len(game.power_up_messages), 1)
         self.assertEqual(game.power_up_messages[0].text, "+life")
+
+
+class TestExtendPaddlePowerUp(BreakoutTestCase):
+    def test_pickups_stack_hits_without_widening_twice(self):
+        game = self.make_game()
+        pickup = breakout.PowerUp(10, 20, "extend_platform", game.screen_height)
+        default_width = game.paddle.width
+        pickup.apply_effect(game.paddle, game.balls, game)
+        expanded_width = game.paddle.width
+        pickup.apply_effect(game.paddle, game.balls, game)
+
+        self.assertTrue(game.paddle.is_expanded)
+        self.assertEqual(expanded_width, default_width * 1.5)
+        self.assertEqual(game.paddle.width, expanded_width)
+        self.assertEqual(game.paddle.expand_hits, 10)
