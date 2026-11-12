@@ -200,3 +200,26 @@ class TestBrickCollision(BreakoutTestCase):
         self.assertEqual(len(particles), 8)
         self.assertLess(ball.dx, 0)
         self.assertEqual(brick.hits, 2)
+
+
+class TestBrickScoring(BreakoutTestCase):
+    def test_surviving_hit_scores_nothing_and_final_hit_scores_ten(self):
+        game = self.make_game()
+        brick = breakout.Brick(100, 100, 50, 20, 2)
+        brick.power_up_type = None
+        brick.hits = 2
+        brick.max_hits = 2
+        brick.color = brick.get_color()
+        game.bricks = [brick]
+        ball = breakout.Ball(game.paddle, 5, 6, 800, 600, x=95, y=110)
+        ball.dx, ball.dy = 5, 0
+        game.balls = [ball]
+
+        with mock.patch.object(breakout.random, "random", return_value=0.5):
+            game.update()
+            self.assertEqual(brick.hits, 1)
+            self.assertEqual(game.score, 0)
+            game.update()
+
+        self.assertTrue(brick.broken)
+        self.assertEqual(game.score, 10)
