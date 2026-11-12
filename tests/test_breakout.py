@@ -1,6 +1,7 @@
 """Offline tests for Breakout's game logic."""
 
 import unittest
+import math
 from unittest import mock
 
 import pygame
@@ -110,3 +111,18 @@ class TestPaddleMovement(BreakoutTestCase):
         paddle.x = 700
         paddle.move("right", 800)
         self.assertEqual(paddle.x, 700)
+
+
+class TestBallLaunch(BreakoutTestCase):
+    def test_launch_uses_forty_five_degree_limit_and_preserves_speed(self):
+        paddle = breakout.Paddle(550, 100, 12, 800)
+        ball = breakout.Ball(paddle, 8, 6, 800, 600)
+        with mock.patch.object(breakout.random, "uniform", return_value=math.pi / 4) as uniform:
+            ball.launch()
+
+        uniform.assert_called_once_with(-math.pi / 4, math.pi / 4)
+        angle = math.atan2(ball.dx, -ball.dy)
+        self.assertFalse(ball.attached)
+        self.assertAlmostEqual(angle, math.pi / 4)
+        self.assertLessEqual(abs(angle), math.pi / 4)
+        self.assertAlmostEqual(math.hypot(ball.dx, ball.dy), ball.speed)
