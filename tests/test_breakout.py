@@ -311,3 +311,27 @@ class TestSlowTimePowerUp(BreakoutTestCase):
         self.assertEqual(ball.slow_timer, 0)
         self.assertEqual(ball.speed, ball.default_speed)
         self.assertAlmostEqual(math.hypot(ball.dx, ball.dy), ball.default_speed)
+
+
+class TestExtraBallDuringSlowTime(BreakoutTestCase):
+    def test_extra_ball_matches_existing_slowed_speed(self):
+        game = self.make_game()
+        original = game.balls[0]
+        original.attached = False
+        original.dx, original.dy = original.speed, 0
+        breakout.PowerUp(0, 0, "slow_time", game.screen_height).apply_effect(
+            game.paddle, game.balls, game)
+        slowed_speed = original.speed
+
+        with mock.patch.object(breakout.random, "uniform", side_effect=(game.margin, math.pi / 2)):
+            breakout.PowerUp(0, 0, "extra_ball", game.screen_height).apply_effect(
+                game.paddle, game.balls, game)
+
+        new_ball = game.balls[1]
+        self.assertEqual(new_ball.slow_timer, original.slow_timer)
+        self.assertAlmostEqual(new_ball.speed, slowed_speed)
+        self.assertAlmostEqual(math.hypot(new_ball.dx, new_ball.dy), slowed_speed)
+        new_ball.slow_timer = 1
+        new_ball.update()
+        self.assertEqual(new_ball.speed, original.default_speed)
+        self.assertAlmostEqual(math.hypot(new_ball.dx, new_ball.dy), original.default_speed)
