@@ -503,3 +503,22 @@ class TestMenuResults(BreakoutTestCase):
             with self.subTest(menu="pause", index=index), \
                     mock.patch.object(breakout.Menu, "run", return_value=index):
                 self.assertEqual(pause.run(), expected)
+
+
+class TestMenuNavigation(BreakoutTestCase):
+    def test_up_and_down_wrap_across_available_options(self):
+        screen = pygame.Surface((800, 600))
+        menu = breakout.Menu(screen, 800, 600, options=["one", "two", "three"])
+        events = [
+            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP),
+            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_DOWN),
+            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_UP),
+            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN),
+        ]
+        with mock.patch.object(pygame.event, "get", return_value=events), \
+                mock.patch.object(menu, "draw"), \
+                mock.patch.object(pygame.display, "flip"):
+            result = menu.run()
+
+        self.assertEqual(result, 2)
+        self.assertEqual(menu.selected, 2)
