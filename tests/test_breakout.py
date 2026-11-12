@@ -349,3 +349,15 @@ class TestExtraBallPowerUp(BreakoutTestCase):
         self.assertAlmostEqual(new_ball.dx, 0)
         self.assertGreater(new_ball.dy, 0)
         self.assertAlmostEqual(math.hypot(new_ball.dx, new_ball.dy), new_ball.speed)
+
+
+class TestExtraLifePowerUp(BreakoutTestCase):
+    def test_extra_life_adds_life_and_feedback_message(self):
+        game = self.make_game()
+        starting_lives = game.lives
+        breakout.PowerUp(30, 40, "extra_life", game.screen_height).apply_effect(
+            game.paddle, game.balls, game)
+
+        self.assertEqual(game.lives, starting_lives + 1)
+        self.assertEqual(len(game.power_up_messages), 1)
+        self.assertEqual(game.power_up_messages[0].text, "+life")
