@@ -26,3 +26,23 @@ class TestTestFixtures(BreakoutTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestBrickDurability(BreakoutTestCase):
+    def test_hits_change_color_then_break_brick(self):
+        brick = breakout.Brick(10, 20, 40, 12, 3, power_up_type=None)
+        brick.power_up_type = None
+        brick.hits = 3
+        brick.max_hits = 3
+        brick.color = brick.get_color()
+
+        self.assertEqual(brick.color, breakout.LIGHT_ORANGE)
+        brick.hit()
+        self.assertEqual(brick.hits, 2)
+        self.assertEqual(brick.color, breakout.DARK_ORANGE)
+        self.assertFalse(brick.broken)
+        brick.hit()
+        self.assertEqual(brick.color, breakout.RED)
+        brick.hit()
+        self.assertTrue(brick.broken)
+        self.assertEqual(brick.hits, 0)
