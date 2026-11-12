@@ -72,3 +72,15 @@ class TestBrickHitDistribution(BreakoutTestCase):
                     bricks = game.create_bricks()
                 self.assertTrue(bricks)
                 self.assertTrue(all(brick.hits == expected_hits for brick in bricks))
+
+
+class TestBrickRowCaps(BreakoutTestCase):
+    def test_rows_increase_by_two_until_capped_at_twenty_five(self):
+        for level, expected_rows in ((1, 17), (2, 19), (4, 23), (5, 25), (12, 25)):
+            with self.subTest(level=level):
+                game = self.make_game(level)
+                with mock.patch.object(breakout.random, "uniform", return_value=0.75):
+                    bricks = game.create_bricks()
+                occupied_rows = {round((brick.y - game.top_margin) / (game.brick_height + game.gap))
+                                 for brick in bricks}
+                self.assertEqual(len(occupied_rows), expected_rows)
