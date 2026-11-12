@@ -461,3 +461,24 @@ class TestBombPowerUpProtection(BreakoutTestCase):
         self.assertTrue(bomb.broken)
         self.assertFalse(protected.broken)
         self.assertEqual(protected.hits, 1)
+
+
+class TestPauseResume(BreakoutTestCase):
+    def test_resume_shows_three_countdown_ticks_then_unpauses(self):
+        game = self.make_game()
+        game.paused = True
+
+        def stop_after_resume():
+            game.running = False
+
+        with mock.patch.object(breakout.PauseMenu, "run", return_value="resume"), \
+                mock.patch.object(game, "draw"), \
+                mock.patch.object(game, "handle_events", side_effect=stop_after_resume), \
+                mock.patch.object(game, "update"), \
+                mock.patch.object(pygame.display, "flip"), \
+                mock.patch.object(pygame.time, "wait") as wait:
+            result = game.run()
+
+        self.assertIsNone(result)
+        self.assertFalse(game.paused)
+        self.assertEqual([call.args[0] for call in wait.call_args_list], [1000, 1000, 1000])
