@@ -126,3 +126,16 @@ class TestBallLaunch(BreakoutTestCase):
         self.assertAlmostEqual(angle, math.pi / 4)
         self.assertLessEqual(abs(angle), math.pi / 4)
         self.assertAlmostEqual(math.hypot(ball.dx, ball.dy), ball.speed)
+
+
+class TestWallCollision(BreakoutTestCase):
+    def test_left_wall_corrects_position_and_reverses_horizontal_motion(self):
+        game = self.make_game()
+        ball = breakout.Ball(game.paddle, 5, 6, 800, 600, x=1, y=300)
+        ball.dx, ball.dy = -3, -4
+        with mock.patch.object(breakout.random, "uniform", return_value=0):
+            ball.check_collision(game.paddle, [], game)
+
+        self.assertEqual(ball.x, ball.radius)
+        self.assertGreater(ball.dx, 0)
+        self.assertAlmostEqual(math.hypot(ball.dx, ball.dy), ball.speed)
