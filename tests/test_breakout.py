@@ -26,10 +26,6 @@ class TestTestFixtures(BreakoutTestCase):
         self.assertTrue(game.balls[0].attached)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestBrickDurability(BreakoutTestCase):
     def test_hits_change_color_then_break_brick(self):
         brick = breakout.Brick(10, 20, 40, 12, 3, power_up_type=None)
@@ -117,9 +113,10 @@ class TestBallLaunch(BreakoutTestCase):
     def test_launch_uses_forty_five_degree_limit_and_preserves_speed(self):
         paddle = breakout.Paddle(550, 100, 12, 800)
         ball = breakout.Ball(paddle, 8, 6, 800, 600)
-        with mock.patch.object(breakout.random, "uniform", return_value=math.pi / 4):
+        with mock.patch.object(breakout.random, "uniform", return_value=math.pi / 4) as uniform:
             ball.launch()
 
+        uniform.assert_called_once_with(-math.pi / 4, math.pi / 4)
         angle = math.atan2(ball.dx, -ball.dy)
         self.assertFalse(ball.attached)
         self.assertAlmostEqual(angle, math.pi / 4)
@@ -522,3 +519,7 @@ class TestMenuNavigation(BreakoutTestCase):
 
         self.assertEqual(result, 2)
         self.assertEqual(menu.selected, 2)
+
+
+if __name__ == "__main__":
+    unittest.main()
