@@ -584,19 +584,17 @@ class PowerUp:
         elif effect == "extra_ball":
             new_x = random.uniform(game.margin, game.screen_width - game.margin)
             new_y = game.top_margin
-            current_speed = balls[0].speed if balls else game.base_speed * game.speed_multiplier
-            new_ball = Ball(paddle, current_speed, game.ball_radius, game.screen_width, game.screen_height, x=new_x, y=new_y)
+            source_ball = balls[0] if balls else None
+            normal_speed = source_ball.default_speed if source_ball else game.base_speed * game.speed_multiplier
+            slow_timer = source_ball.slow_timer if source_ball else 0
+            current_speed = normal_speed * 0.5 if slow_timer > 0 else normal_speed
+            new_ball = Ball(paddle, normal_speed, game.ball_radius, game.screen_width, game.screen_height, x=new_x, y=new_y)
+            new_ball.speed = current_speed
             angle = random.uniform(math.pi / 4, 3 * math.pi / 4)
             new_ball.dx = new_ball.speed * math.cos(angle)
             new_ball.dy = new_ball.speed * math.sin(angle)
             new_ball.attached = False
-            if balls and balls[0].slow_timer > 0:
-                new_ball.speed *= 0.5
-                magnitude = (new_ball.dx**2 + new_ball.dy**2)**0.5
-                if magnitude != 0:
-                    new_ball.dx = new_ball.dx / magnitude * new_ball.speed
-                    new_ball.dy = new_ball.dy / magnitude * new_ball.speed
-                new_ball.slow_timer = balls[0].slow_timer
+            new_ball.slow_timer = slow_timer
             balls.append(new_ball)
         elif effect == "extra_life":
             game.lives += 1

@@ -30,6 +30,8 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/
 
 The game opens fullscreen on the largest connected display (by pixel area), which is not always the primary monitor.
 
+Run the offline tests with: `SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy .venv/bin/python -m unittest discover -s tests -v`
+
 ## Controls
 
 | Action | Control |
@@ -90,9 +92,9 @@ One more on level 3 is in [docs/screenshots](docs/screenshots/level-3-powerups.p
 - **Fullscreen only.** There is no windowed mode or resolution option.
 - **Speed depends on resolution and frame rate.** Ball speed is a fixed number of pixels per frame, so the game feels faster on smaller screens, and physics slow down if the machine cannot hold 60 FPS.
 - **No sound, high scores, or saves.** A game over drops you straight back to the title menu.
+- **No CI yet.** The offline unittest suite runs locally with the command above.
 - **Level select stops at 4**, though play continues past it with rows capped at 25.
 - **Rectangle collisions.** The ball uses a bounding box, so corner hits can bounce a little off.
-- **No automated tests or CI yet.**
 
 ## Project structure
 
@@ -101,6 +103,7 @@ breakout.py              the whole game: menus, entities, effects, main loop
 docs/media/gameplay.gif  README demo
 docs/screenshots/        gameplay screenshots
 requirements.txt         pygame
+tests/test_breakout.py   offline game logic tests
 ```
 
 ## Docs

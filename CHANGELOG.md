@@ -20,4 +20,4 @@ Project changes:
 - Added a gameplay GIF to the README.
 - Rewrote the README: badges, demo GIF, features, one-command quick start, controls, architecture diagram, screenshots, limitations, and project structure.
 
-Known limitations: fullscreen only, speed tied to resolution and frame rate, no sound or high scores, and no automated tests or CI yet.
+Known limitations: fullscreen only, speed tied to resolution and frame rate, no sound or high scores, and no CI yet.
